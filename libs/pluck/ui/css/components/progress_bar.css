@@ -1,0 +1,81 @@
+/*
+--------------------------------------------------
+
+This file is part of PLUCK.
+You are free to use these files within your own resources.
+Please retain the original credit and attached MIT license.
+Support honest development.
+
+Author: Case @ BOII Development
+License: https://github.com/boiidevelopment/pluck/blob/main/LICENSE
+GitHub: https://github.com/boiidevelopment/pluck
+
+--------------------------------------------------
+*/
+
+.progress_container {
+    position: fixed;
+    bottom: 10vh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1002;
+    width: 25vw;
+    height: auto;
+    display: none;
+    font-family: var(--header_font);
+}
+
+.progressbar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75vh;
+    animation: fade-in 1s ease-in-out;
+    background: var(--background_main);
+    border: 0.1vh solid rgba(255, 255, 255, 0.06);
+    border-top: 0.2vh solid var(--accent);
+    color: var(--text_primary);
+    padding: 1vh 1.5vh;
+}
+
+.progressbar_header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    color: var(--text_primary);
+}
+
+.progressbar_header h3 {
+    font-size: 0.75rem;
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    color: var(--text_secondary);
+}
+
+.progressbar_body {
+    width: 100%;
+    height: 0.4vh;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    gap: 0.2vh;
+}
+
+.progress_segment {
+    flex: 1;
+    height: 100%;
+    background: var(--accent);
+    transition: opacity 0.5s linear;
+}
+
+.progress_segment_used {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(1vh); }
+    to   { opacity: 1; transform: translateY(0); }
+}

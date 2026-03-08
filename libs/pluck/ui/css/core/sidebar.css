@@ -1,0 +1,202 @@
+/*
+--------------------------------------------------
+
+This file is part of PLUCK.
+You are free to use these files within your own resources.
+Please retain the original credit and attached MIT license.
+Support honest development.
+
+Author: Case @ BOII Development
+License: https://github.com/boiidevelopment/pluck/blob/main/LICENSE
+GitHub: https://github.com/boiidevelopment/pluck
+
+--------------------------------------------------
+*/
+
+.sidebar {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    height: fit-content;
+    max-height: calc(90vh - 16vh);
+    background: var(--background_panel);
+    border: 0.2vh solid rgba(255, 255, 255, 0.06);
+    border-top: 0.2vh solid var(--accent);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    scrollbar-width: none;
+    min-width: 14vw;
+    max-width: 18vw;
+    pointer-events: auto;
+}
+
+.sidebar.right {
+    right: 2vw;
+}
+
+.sidebar.left {
+    left: 2vw;
+}
+
+.sidebar_title {
+    font-family: var(--header_font);
+    font-size: 0.7rem;
+    padding: 1vh 1.5vh;
+    color: var(--accent);
+    border-bottom: 0.2vh solid rgba(255, 255, 255, 0.06);
+    text-transform: uppercase;
+    letter-spacing: 0.15rem;
+}
+
+.sidebar_body {
+    padding: 0.5vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar_item_wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar_item {
+    display: flex;
+    align-items: center;
+    gap: 1vh;
+    cursor: pointer;
+    transition: background 0.15s;
+    padding: 0.8vh 1.5vh;
+    background: transparent;
+    border-bottom: 0.1vh solid rgba(255, 255, 255, 0.04);
+    position: relative;
+}
+
+.sidebar_item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background: var(--accent);
+    transition: width 0.15s;
+}
+
+.sidebar_item:hover::before {
+    width: 0.2vh;
+}
+
+.sidebar_item:hover {
+    background: var(--background_hover);
+}
+
+.sidebar_icon {
+    width: 1.8vh;
+    height: 1.8vh;
+    object-fit: contain;
+    flex-shrink: 0;
+    color: var(--text_secondary);
+    transition: color 0.15s;
+}
+
+.sidebar_item:hover .sidebar_icon {
+    color: var(--accent);
+}
+
+.sidebar_text {
+    font-family: var(--text_font);
+    font-size: 0.8rem;
+    color: var(--text_secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+    transition: color 0.15s;
+}
+
+.sidebar_item:hover .sidebar_text {
+    color: var(--text_primary);
+}
+
+.sidebar_button_group {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar_submenu {
+    display: none;
+    flex-direction: column;
+    background: var(--background_main);
+    border-bottom: 0.1vh solid rgba(255, 255, 255, 0.04);
+}
+
+.sidebar_subitem {
+    display: flex;
+    align-items: center;
+    gap: 1vh;
+    cursor: pointer;
+    transition: background 0.15s;
+    padding: 0.7vh 3vh;
+    border-bottom: 0.1vh solid rgba(255, 255, 255, 0.04);
+    position: relative;
+}
+
+.sidebar_subitem:hover {
+    background: var(--background_hover);
+}
+
+.sidebar_subitem .sidebar_text {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.sidebar_subitem:hover .sidebar_text {
+    opacity: 1;
+    color: var(--text_primary);
+}
+
+.sidebar_chevron {
+    margin-left: auto;
+    font-size: 0.6rem;
+    color: var(--text_tertiary);
+    transition: transform 0.2s ease;
+}
+
+.sidebar_chevron.open {
+    transform: rotate(180deg);
+}
+
+.sidebar_subitem_wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar_sub_submenu {
+    display: none;
+    flex-direction: column;
+    background: var(--background_overlay);
+    border-bottom: 0.1vh solid rgba(255, 255, 255, 0.04);
+}
+
+.sidebar_sub_subitem {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.6vh 4.5vh;
+    border-bottom: 0.1vh solid rgba(255, 255, 255, 0.04);
+    transition: background 0.15s;
+}
+
+.sidebar_sub_subitem:hover {
+    background: var(--background_hover);
+}
+
+.sidebar_sub_subitem .sidebar_text {
+    font-size: 0.7rem;
+    opacity: 0.6;
+}
+
+.sidebar_sub_subitem:hover .sidebar_text {
+    opacity: 1;
+    color: var(--text_primary);
+}

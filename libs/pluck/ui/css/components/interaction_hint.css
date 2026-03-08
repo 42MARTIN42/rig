@@ -1,0 +1,69 @@
+/*
+--------------------------------------------------
+
+This file is part of PLUCK.
+You are free to use these files within your own resources.
+Please retain the original credit and attached MIT license.
+Support honest development.
+
+Author: Case @ BOII Development
+License: https://github.com/boiidevelopment/pluck/blob/main/LICENSE
+GitHub: https://github.com/boiidevelopment/pluck
+
+--------------------------------------------------
+*/
+
+.interaction_hint {
+    position: absolute;
+    bottom: 8vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1vw;
+    font-family: var(--header_font);
+    background: var(--background_main);
+    border: 0.1vh solid rgba(255, 255, 255, 0.06);
+    border-top: 0.2vh solid var(--accent);
+    padding: 0.75vh 2vw;
+}
+
+.hint_item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1vh;
+}
+
+.hint_item img {
+    height: 3vh;
+    padding: 0.4vh;
+    object-fit: cover;
+    background: var(--background_panel);
+    border: 0.1vh solid rgba(255, 255, 255, 0.08);
+}
+
+.hint_message {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: var(--text_primary);
+    line-height: 0.8;
+}
+
+#hint_status {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08rem;
+    color: var(--text_primary);
+}
+
+#hint_action {
+    font-family: var(--text_font);
+    font-size: 0.65rem;
+    color: var(--text_secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+}

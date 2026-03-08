@@ -1,0 +1,224 @@
+/*
+--------------------------------------------------
+
+This file is part of PLUCK.
+You are free to use these files within your own resources.
+Please retain the original credit and attached MIT license.
+Support honest development.
+
+Author: Case @ BOII Development
+License: https://github.com/boiidevelopment/pluck/blob/main/LICENSE
+GitHub: https://github.com/boiidevelopment/pluck
+
+--------------------------------------------------
+*/
+
+#modal_container {
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    z-index: 103;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background_overlay);
+}
+
+.modal {
+    display: flex;
+    flex-direction: column;
+    background: var(--background_main);
+    border: 0.1vh solid rgba(255, 255, 255, 0.06);
+    border-top: 0.2vh solid var(--accent);
+    color: var(--text_primary);
+    font-family: var(--text_font);
+    width: fit-content;
+    min-width: 28vh;
+    pointer-events: auto;
+}
+
+.modal_title {
+    position: relative;
+    font-size: 0.85rem;
+    color: var(--text_primary);
+    padding: 1.25vh 2vh;
+    font-weight: normal;
+    font-family: var(--header_font);
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    border-bottom: 0.1vh solid rgba(255, 255, 255, 0.06);
+    margin: 0;
+}
+
+.modal_inputs {
+    padding: 1.5vh 2vh;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5vh;
+}
+
+.modal_field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75vh;
+}
+
+.modal_field label {
+    position: relative;
+    display: flex;
+    align-items: center;
+    font-size: 0.7rem;
+    color: var(--text_secondary);
+    padding-left: 0.75vh;
+    text-transform: uppercase;
+    letter-spacing: 0.08rem;
+}
+
+.modal_field label::before {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    content: "";
+    width: 0.2vh;
+    background: var(--accent);
+}
+
+.modal_field input,
+.modal_field textarea {
+    font-size: 0.75rem;
+    font-family: var(--text_font);
+    background: var(--background_panel);
+    color: var(--text_primary);
+    border: 0.1vh solid rgba(255, 255, 255, 0.06);
+    padding: 0.6vh 1vh;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.modal_field input:hover,
+.modal_field input:focus,
+.modal_field textarea:hover,
+.modal_field textarea:focus {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.modal_field textarea {
+    min-height: 10vh;
+    resize: vertical;
+    width: 100%;
+}
+
+.modal_field textarea::-webkit-scrollbar { width: 0.2vh; }
+.modal_field textarea::-webkit-scrollbar-thumb { background: var(--accent); }
+
+.modal_select_wrapper {
+    position: relative;
+    width: 100%;
+    font-family: var(--text_font);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vh;
+}
+
+.modal_select {
+    padding: 0.6vh 1vh;
+    color: var(--text_primary);
+    font-size: 0.75rem;
+    background: var(--background_panel);
+    border: 0.1vh solid rgba(255, 255, 255, 0.06);
+    transition: border-color 0.15s;
+}
+
+.modal_select:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.modal_select_options {
+    width: 100%;
+    background: var(--background_panel);
+    border: 0.1vh solid rgba(255, 255, 255, 0.06);
+    border-top: 0.2vh solid var(--accent);
+    max-height: 20vh;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.modal_select_options .custom_option {
+    padding: 0.75vh 1vh;
+    color: var(--text_secondary);
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    border-bottom: 0.1vh solid rgba(255, 255, 255, 0.04);
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+}
+
+.modal_select_options .custom_option:last-child {
+    border-bottom: none;
+}
+
+.modal_select_options .custom_option:hover {
+    background: var(--background_hover);
+    color: var(--accent);
+}
+
+.modal_actions {
+    display: flex;
+    padding: 1.5vh 2vh;
+    border-top: 0.1vh solid rgba(255, 255, 255, 0.06);
+}
+
+.modal_button_group {
+    width: 100%;
+}
+
+.modal_field input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 0.4vh;
+    background: var(--background_panel);
+    border: none;
+    cursor: pointer;
+    outline: none;
+    padding: 0;
+}
+
+.modal_field input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 2vh;
+    width: 0.5vh;
+    background: var(--accent);
+    cursor: pointer;
+}
+
+.modal_field input[type="range"]::-webkit-slider-thumb:hover {
+    background: var(--accent2);
+}
+
+.modal_field input[type="range"]::-moz-range-thumb {
+    height: 2vh;
+    width: 0.5vh;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+}
+
+.modal_field input[type="range"]::-moz-range-track {
+    background: transparent;
+    border: none;
+}
+
+.slider_value {
+    margin-left: auto;
+    font-size: 0.7rem;
+    color: var(--accent);
+    font-family: var(--text_font);
+    letter-spacing: 0.05rem;
+}

@@ -1,0 +1,108 @@
+/*
+--------------------------------------------------
+
+This file is part of PLUCK.
+You are free to use these files within your own resources.
+Please retain the original credit and attached MIT license.
+Support honest development.
+
+Author: Case @ BOII Development
+License: https://github.com/boiidevelopment/pluck/blob/main/LICENSE
+GitHub: https://github.com/boiidevelopment/pluck
+
+--------------------------------------------------
+*/
+
+.notify_container {
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.notify {
+    background: var(--background_main);
+    border: 0.1vh solid rgba(255, 255, 255, 0.06);
+    border-left: 0.2vh solid var(--accent);
+    color: var(--text_primary);
+    min-width: 15vw;
+    max-width: 30vw;
+    pointer-events: auto;
+    font-family: var(--text_font);
+    display: flex;
+    flex-direction: column;
+    animation: slide_in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.notify_header {
+    font-family: var(--header_font);
+    font-size: 0.78rem;
+    color: var(--text_primary);
+    text-transform: uppercase;
+    letter-spacing: 0.08rem;
+    display: flex;
+    align-items: center;
+    gap: 1vh;
+    padding: 0.75vh 1vh 0.25vh;
+}
+
+.notify_body {
+    font-size: 0.72rem;
+    color: var(--text_secondary);
+    display: flex;
+    align-items: center;
+    gap: 1vh;
+    padding: 0 1vh 0.75vh;
+    line-height: 1.4;
+    letter-spacing: 0.03rem;
+}
+
+.notify_bar {
+    height: 0.2vh;
+    background: rgba(255, 255, 255, 0.04);
+    overflow: hidden;
+    position: relative;
+}
+
+.notify_fill {
+    width: 100%;
+    height: 100%;
+    transition: width linear;
+}
+
+.notify_icon {
+    font-size: 0.85rem;
+    background: var(--background_panel);
+    border: 0.1vh solid rgba(255, 255, 255, 0.06);
+    padding: 0.5vh;
+    flex-shrink: 0;
+}
+
+.notify_success { border-left-color: var(--notify_success); }
+.notify_error   { border-left-color: var(--notify_error); }
+.notify_info    { border-left-color: var(--notify_info); }
+.notify_warning { border-left-color: var(--notify_warning); }
+.notify_primary { border-left-color: var(--notify_primary); }
+
+.notify_success .notify_icon { color: var(--notify_success); }
+.notify_error   .notify_icon { color: var(--notify_error); }
+.notify_info    .notify_icon { color: var(--notify_info); }
+.notify_warning .notify_icon { color: var(--notify_warning); }
+.notify_primary .notify_icon { color: var(--notify_primary); }
+
+.notify_success .notify_fill { background: var(--notify_success); }
+.notify_error   .notify_fill { background: var(--notify_error); }
+.notify_info    .notify_fill { background: var(--notify_info); }
+.notify_warning .notify_fill { background: var(--notify_warning); }
+.notify_primary .notify_fill { background: var(--notify_primary); }
+
+@keyframes slide_in {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

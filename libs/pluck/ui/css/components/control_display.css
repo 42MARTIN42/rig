@@ -1,0 +1,93 @@
+/*
+--------------------------------------------------
+
+This file is part of PLUCK.
+You are free to use these files within your own resources.
+Please retain the original credit and attached MIT license.
+Support honest development.
+
+Author: Case @ BOII Development
+License: https://github.com/boiidevelopment/pluck/blob/main/LICENSE
+GitHub: https://github.com/boiidevelopment/pluck
+
+--------------------------------------------------
+*/
+
+#control_display_section {
+    position: fixed;
+    top: 50%;
+    left: 2%;
+    transform: translateY(-50%);
+    display: none;
+    background: var(--background_main);
+    border: 0.1vh solid rgba(255, 255, 255, 0.06);
+    border-left: 0.2vh solid var(--accent);
+    color: var(--text_primary);
+    width: fit-content;
+}
+
+#control_display_section h3 {
+    display: flex;
+    justify-content: center;
+    color: var(--accent);
+    font-family: var(--header_font);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15rem;
+    padding: 0.75vh 1.5vh;
+    border-bottom: 0.1vh solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.control_display_grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0.5vh;
+}
+
+.control_display_item {
+    display: flex;
+    gap: 1vh;
+    align-items: center;
+    justify-content: space-between;
+    cursor: default;
+    padding: 0.5vh 0.75vh;
+    border-bottom: 0.1vh solid rgba(255, 255, 255, 0.04);
+    transition: background 0.15s;
+}
+
+.control_display_item:last-child {
+    border-bottom: none;
+}
+
+.control_display_item:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.control_key {
+    background: var(--background_panel);
+    border: 0.1vh solid rgba(255, 255, 255, 0.08);
+    padding: 0.2vh 0.8vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    white-space: nowrap;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-family: var(--header_font);
+    letter-spacing: 0.05rem;
+}
+
+.control_action {
+    font-family: var(--text_font);
+    font-size: 0.68rem;
+    color: var(--text_secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+    padding-right: 0.5vh;
+}

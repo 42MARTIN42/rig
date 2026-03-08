@@ -1,0 +1,18 @@
+{
+    "default_theme": "default",
+    "themes": [ "default" ],
+    "css": [
+        "/libs/pluck/ui/css/fonts.css",
+        "/libs/pluck/ui/css/style.css",
+        "/libs/pluck/ui/css/core/footer.css",
+        "/libs/pluck/ui/css/core/header.css",
+        "/libs/pluck/ui/css/components/audioplayer.css",
+        
+        "/ui/loadscreen/css/main.css",
+
+        "/libs/pluck/ui/css/themes/default.css"
+    ],
+    "js": [
+        "/ui/loadscreen/js/LoadScreen.js"
+    ]
+}
