@@ -147,7 +147,6 @@ RegisterNetEvent("rig:cl:player_died", function()
     CreateThread(function()
         while true do
             if IsControlJustPressed(0, 74) then
-                print("is pressing respawn key")
                 TriggerServerEvent("rig:sv:player_respawn")
                 break
             end

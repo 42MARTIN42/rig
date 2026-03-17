@@ -522,7 +522,6 @@ local function build_footer_keys()
             on_action = function()
                 local style = get_style(current_sex)
                 Wait(10)
-                print("currrent sex in appearance", current_sex)
                 TriggerServerEvent("rig:sv:save_appearance", current_sex, style)
             end
         }

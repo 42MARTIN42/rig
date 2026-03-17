@@ -184,4 +184,83 @@ locales.statuses = {
     log_player_picked_up = "Player %s was picked up.",
 }
 
+locales.inventory = {
+    client = {
+        ui = {
+            open = "OPEN",
+            closed = "CLOSED",
+            unknown = "unknown",
+            vehicle_missing = "[Vehicle Container] Vehicle does not exist",
+            vehicle_toggle = "[Vehicle Container] Setting %s to %s",
+            glovebox_no_anim = "[Vehicle Container] Glovebox access (no animation)",
+            server_id = "Server ID: %d",
+            equipment = "Equipment",
+            inventory = "Inventory",
+            vicinity = "Vicinity",
+            ground = "Ground",
+            glovebox = "Glovebox",
+            trunk = "Trunk",
+            unequip = "Unequip",
+            head_view = "Head View",
+            body_view = "Body View",
+            guide = "Guide",
+            close = "Close",
+            opening_guide = "Opening inventory guide...",
+            pick_up = "Pick Up",
+            use = "Use",
+            split_stack = "Split Stack",
+            quantity = "Quantity",
+            confirm = "Confirm",
+            cancel = "Cancel",
+            modal_data = "modal data: %s",
+            no_actions = "no actions %s",
+            item_def_missing = "Item definition missing: %s",
+            anim_data_missing = "Animation data missing",
+            clothing = {
+                hat = "Hat",
+                mask = "Mask",
+                glasses = "Glasses",
+                earrings = "Earrings",
+                necklace = "Necklace",
+                shirt = "Shirt",
+                gloves = "Gloves",
+                bracelet = "Bracelet",
+                watch = "Watch",
+                pants = "Pants",
+                bag = "Bag",
+                top = "Top",
+                hair = "Hair",
+                reset = "Reset",
+                visor = "Visor",
+                shoes = "Shoes",
+                reset_title = "Reset Clothing",
+                reset_desc = "Reset all clothing to default",
+                reset_all = "Reset All",
+                toggle = "Toggle",
+                toggle_desc = "Toggle your %s on/off"
+            },
+
+            slot = {
+                helmet = "Helmet",
+                mask = "Mask",
+                shirt = "Shirt",
+                vest = "Vest",
+                backpack = "Backpack",
+                pants = "Pants",
+                shoes = "Shoes",
+                primary = "Primary",
+                secondary = "Secondary",
+                melee = "Melee"
+            },
+
+            vehicle = {
+                already_open = "This vehicle is already being accessed by another player",
+                lock_failed = "Failed to lock vehicle container",
+                opened = "Vehicle container opened",
+                closed = "Vehicle container closed"
+            }
+        },
+    }
+}
+
 return locales

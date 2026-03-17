@@ -89,8 +89,8 @@ const inventory_slots_page = {
                 slot_count: 16, columns: 8, slot_size: "65px", collapsible: true, collapsed: false,
                 items: {
                     "1": {
-                        id: "ammo_pistol",
-                        image: "/libs/pluck/ui/assets/items/ammo_pistol.png",
+                        id: "ammo_9mm",
+                        image: "/libs/pluck/ui/assets/items/ammo_9mm.png",
                         quantity: 50,
                         category: "ammunition",
                         on_hover: {
@@ -259,8 +259,8 @@ const inventory_slots_page = {
                 }
             },
             "2": {
-                id: "ammo_pistol",
-                image: "/libs/pluck/ui/assets/items/ammo_pistol.png",
+                id: "ammo_9mm",
+                image: "/libs/pluck/ui/assets/items/ammo_9mm.png",
                 quantity: 48,
                 category: "ammunition",
                 on_hover: {
@@ -339,8 +339,8 @@ const inventory_grid_page = {
                 collapsed: false,
                 items: [
                     {
-                        id: "ammo_pistol",
-                        image: "/libs/pluck/ui/assets/items/ammo_pistol.png",
+                        id: "ammo_9mm",
+                        image: "/libs/pluck/ui/assets/items/ammo_9mm.png",
                         label: "9mm",
                         col: 1, row: 1, w: 1, h: 1,
                         quantity: 50,
@@ -556,6 +556,7 @@ const inventory_grid_page = {
 
     right: {
         type: "grid",
+        section_key: "vehicle:trunk:ABC123",
         title: { text: "Vicinity", span: `<i class="fa-solid fa-location-dot"></i> Ground` },
         layout: { scroll_x: "none", scroll_y: "scroll", columns: 10, rows: 20, cell_size: "3vw" },
         items: [
@@ -580,8 +581,8 @@ const inventory_grid_page = {
                 }
             },
             {
-                id: "ammo_pistol_ground",
-                image: "/libs/pluck/ui/assets/items/ammo_pistol.png",
+                id: "ammo_9mm_ground",
+                image: "/libs/pluck/ui/assets/items/ammo_9mm.png",
                 label: "9mm",
                 col: 4, row: 1, w: 1, h: 1,
                 quantity: 48,

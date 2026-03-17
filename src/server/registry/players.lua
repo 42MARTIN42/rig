@@ -18,7 +18,7 @@ License: LGPL-3.0
 
 --- @section Imports
 
-local Player = require("src.server.player.class")
+local Player = require("src.server.players.classes.player")
 local utils = require("src.server.modules.utils")
 local bucket_cfg = require("configs.buckets")
 

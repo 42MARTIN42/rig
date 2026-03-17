@@ -172,7 +172,6 @@ handlers.close_action_menu = () => {
     }
 }
 
-
 /**
  * Updates interaction hint
  */
@@ -305,12 +304,21 @@ handlers.destroy_controls = () => {
  * Update slots UI 
  */
 handlers.update_slots = (data) => {
-    if (!data || !data.items) return;
+    if (!data || !data.items) { return; }
+
+    const ui = window.ui_instance;
+    if (!ui || !ui.content) { return; }
+    
+    ui.content.update_slots_from_server(data.items);
+};
+
+handlers.update_grid = (data) => {
+    if (!data || !data.items || !data.section_key) return;
 
     const ui = window.ui_instance;
     if (!ui || !ui.content) return;
 
-    ui.content.update_slots_from_server(data.items);
+    ui.content.update_grid_from_server(data.items, data.section_key);
 };
 
 /**
@@ -498,7 +506,7 @@ window.test_slot_popup = () => {
         { item_id: "water", image: "/libs/pluck/ui/assets/items/water.png", quantity: 5, action: "added", rarity: "common" },
         { item_id: "weapon_pistol", image: "/libs/pluck/ui/assets/items/weapon_pistol.png", quantity: 1, action: "added", rarity: "rare" },
         { item_id: "cash", image: "/libs/pluck/ui/assets/items/cash.png", quantity: 100, action: "removed", rarity: "uncommon" },
-        { item_id: "ammo_pistol", image: "/libs/pluck/ui/assets/items/ammo_pistol.png", quantity: 50, action: "added", rarity: "legendary" }
+        { item_id: "ammo_9mm", image: "/libs/pluck/ui/assets/items/ammo_9mm.png", quantity: 50, action: "added", rarity: "legendary" }
     ];
 
     let delay = 0;

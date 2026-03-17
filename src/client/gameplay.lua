@@ -31,6 +31,8 @@ SetGarbageTrucks(false)
 SetCreateRandomCops(false)
 SetCreateRandomCopsNotOnScenarios(false)
 SetCreateRandomCopsOnScenarios(false)
+SetWeaponsNoAutoreload(true)
+SetWeaponsNoAutoswap(true)
 
 --- @section Threads
 

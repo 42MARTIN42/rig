@@ -147,7 +147,6 @@ export class Content {
                         $groups_wrapper.append($group_el);
 
                         const items = this.page_items[id][s][group.id] || [];
-
                         const grid_instance = new Grid({
                             layout: { ...(section.layout || {}), ...(group.layout || {}) },
                             items: Array.isArray(items) ? items : Object.values(items),
@@ -155,7 +154,6 @@ export class Content {
                             on_move: this.create_move_handler(id),
                             draggable: group.draggable ?? true
                         });
-
                         grid_instance.render_to(`#${container_id}`);
                         grid_instances.push(grid_instance);
                     }
@@ -164,19 +162,15 @@ export class Content {
                         $(`#${$(this).data("target")}`).toggleClass("collapsed");
                     });
                 } else {
-                    // Flat single grid — items stored under _default.
                     const items = this.page_items[id][s]["_default"] || [];
-
                     const flat_container_id = `grid_flat_${s}`;
                     $body.append(`<div class="grid_container" id="${flat_container_id}"></div>`);
-
                     const grid_instance = new Grid({
                         layout: section.layout || {},
-                        section_key: s,
+                        section_key: section.section_key || s,
                         items: Array.isArray(items) ? items : Object.values(items),
                         on_move: this.create_move_handler(id)
                     });
-
                     grid_instance.render_to(`#${flat_container_id}`);
                     grid_instances.push(grid_instance);
                 }
@@ -242,15 +236,9 @@ export class Content {
      * @returns {Function}
      */
     create_move_handler(page_id) {
-        return async (item_id, from_col, from_row, to_col, to_row, from_section, to_section) => {
-            // Update local cache.
-            // section_key for grouped grids is "{section}_{group_id}", for flat grids just "{section}".
-            // We locate the item by its old position and update col/row in place.
+        return async (item_id, from_col, from_row, to_col, to_row, from_section, to_section, dataset) => {
             const page = this.page_items[page_id];
             if (page) {
-                // Resolve which cache bucket this section_key maps to.
-                // Grouped: from_section = "left_vest" → section = "left", group = "vest"
-                // Flat:    from_section = "right"     → section = "right", key = "_default"
                 const resolve = (section_key) => {
                     for (const s of ["left", "center", "right"]) {
                         if (section_key === s) return { bucket: page[s], key: "_default" };
@@ -296,7 +284,8 @@ export class Content {
                 to_col,
                 to_row,
                 from_section,
-                to_section
+                to_section,
+                dataset
             });
         };
     }
@@ -329,7 +318,9 @@ export class Content {
             if (!sec) continue;
 
             for (const [group_id, slots] of Object.entries(server_items)) {
-                if (sec[group_id]) {
+                if (sec[group_id] !== undefined) {
+                    sec[group_id] = JSON.parse(JSON.stringify(slots));
+                } else {
                     sec[group_id] = JSON.parse(JSON.stringify(slots));
                 }
             }
@@ -342,7 +333,7 @@ export class Content {
 
     /**
      * @param {Array<Object>} server_items
-     * @param {string} section_key - Either a bare section ("right") or grouped key ("left_vest").
+     * @param {string} section_key
      */
     update_grid_from_server(server_items, section_key = "center") {
         if (!this.current_page_id) return;
@@ -350,7 +341,6 @@ export class Content {
         const page = this.page_items[this.current_page_id];
         if (!page) return;
 
-        // Resolve section + cache key from section_key.
         for (const s of ["left", "center", "right"]) {
             if (section_key === s) {
                 page[s]["_default"] = JSON.parse(JSON.stringify(server_items));

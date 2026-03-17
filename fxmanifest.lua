@@ -14,7 +14,7 @@ games { "gta5" }
 
 --- Metadata
 name "rig"
-version "0.1.0"
+version "0.2.0"
 description "A drop in ready survival framework."
 author "Case"
 lua54 "yes"
@@ -32,7 +32,8 @@ files {
     "configs/tattoos.lua",
 
     "libs/pluck/ui/**/*",
-    "ui/loadscreen/**/*"
+    "ui/loadscreen/**/*",
+    "ui/inventory/*"
 }
 
 --- Scripts
@@ -52,12 +53,7 @@ server_scripts {
     "@oxmysql/lib/MySQL.lua",
     "configs/*.lua",
 
-    "src/server/init.lua",
-    "src/server/events.lua",
-    "src/server/api.lua",
-    "src/server/commands.lua",
-    "src/server/callbacks.lua",
-    "src/server/gameplay.lua"
+    "src/server/**/**/*.lua"
 }
 
 --- Deps & Provides

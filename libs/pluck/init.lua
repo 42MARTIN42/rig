@@ -235,6 +235,24 @@ else
     pluck.set_slot_move_handler = set_slot_move_handler
     exports("set_slot_move_handler", set_slot_move_handler)
 
+    --- Updates inventory grid UI from raw item data.
+    --- Handles sanitizing and sending to NUI.
+    --- @param items table: Raw UI item table (not sanitized).
+    --- @param section_key string: Section key to update e.g. "left_pockets".
+    local function update_grid(items, section_key)
+        if type(items) ~= "table" then
+            pluck.log("warn", "update_grid: invalid items table")
+            return
+        end
+
+        local safe_items = pluck.sanitize_ui(items, "inventory_update")
+
+        SendNUIMessage({ func = "update_grid", items = safe_items, section_key = section_key })
+    end
+
+    pluck.update_grid = update_grid
+    exports("update_grid", update_grid)
+
     pluck.grid_move_handler = nil
 
     --- Allows setting a custom hook to handle grid movement logic.

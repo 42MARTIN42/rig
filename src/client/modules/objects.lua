@@ -58,11 +58,9 @@ end
 local function play_confirm_anim(ped)
     requests.anim(PLACE_ANIM_DICT)
     TaskPlayAnim(ped, PLACE_ANIM_DICT, PLACE_ANIM_NAME, 8.0, -8.0, PLACE_ANIM_DURATION, 1, 0, false, false, false)
-    pluck.show_circle({
-        message = "Placing...",
-        duration = PLACE_ANIM_DURATION / 1000,
-        segments = 30,
-        gap = 3
+    pluck.show_progressbar({
+        header = "Placing...",
+        duration = PLACE_ANIM_DURATION
     })
     Wait(PLACE_ANIM_DURATION)
 end

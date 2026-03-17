@@ -40,7 +40,18 @@ core.convars = {
     server_name = GetConvar("rig:server_name", "RIG"),
     server_tagline = GetConvar("rig:server_tagline", "Survival Framework (pre-alpha v0.0.1)"),
     server_logo = GetConvar("rig:server_logo", "/libs/pluck/ui/assets/logos/logo.png"),
+    inventory_open_key = GetConvar("rig:inventory_open_key", "I"),
+    inventory_center = GetConvar("rig:inventory_center", "loadout"),
+    inventory_table = GetConvar("rig:inventory_table", "rig_inventories"),
+    image_path = GetConvar("rig:image_path", "nui://rig/ui/inventory/"),
 }
+core.vars = not core.is_server and {
+    current_vehicle_data = nil,
+    current_vehicle = nil,
+    current_inv_type = nil,
+    current_container = nil,
+    client_drops = {}
+} or {}
 
 --- @section Utility Functions
 
@@ -68,10 +79,10 @@ end
 core.log = log
 _G.log = log
 
---- Translates a string to a locale key
+--- locales a string to a locale key
 --- @param key string: Locale key string
 --- @param ... any: Arguments for string.format
---- @return string: localed string
+--- @return string: Localized string
 local function locale(key, ...)
     local str = core.locales[key]
     if not str and type(key) == "string" then
@@ -125,6 +136,266 @@ if loaded_locale then
     core.locales = loaded_locale
 end
 
+--- @section Server
+
+if core.is_server then
+
+    --- @section Players
+
+    local Players = require("src.server.registry.players")
+
+    core.players = Players.new()
+
+    core.player_extensions = {
+        { name = "appearance", class = require("src.server.players.classes.extensions.appearance"), priority = 100 },
+        { name = "spawns", class = require("src.server.players.classes.extensions.spawns"), priority = 99 },
+        { name = "statuses", class = require("src.server.players.classes.extensions.statuses"), priority = 98 },
+        { name = "injuries", class = require("src.server.players.classes.extensions.injuries"), priority = 97 },
+        { name = "effects", class = require("src.server.players.classes.extensions.effects"), priority = 96 },
+        { name = "inventory", class = require("src.server.players.classes.extensions.inventory"), priority = 95 },
+    }
+
+    function core.register_player_extension(name, fn, priority)
+        core.players:register_extension(name, fn, priority)
+    end
+
+    exports("register_player_extension", core.register_player_extension)
+
+    for _, ext in ipairs(core.player_extensions) do
+        core.register_player_extension(ext.name, function(player)
+            local instance = setmetatable({ player = player }, { __index = ext.class })
+            player:add_extension(ext.name, instance)
+        end, ext.priority)
+    end
+
+    --- @section Objects
+
+    local Objects = require("src.server.registry.objects")
+
+    core.objects = Objects.new()
+
+    --- @section Weather + Buckets
+
+    local cfg_buckets = require("configs.buckets")
+    local cfg_weather = require("configs.weather")
+
+    core.bucket_environments = {}
+
+    SetTimeout(150, function()
+        for _, bucket_config in pairs(cfg_buckets) do
+            local bucket_id = bucket_config.bucket
+            if bucket_config.mode then
+                SetRoutingBucketEntityLockdownMode(bucket_id, bucket_config.mode)
+            end
+            if bucket_config.population_enabled ~= nil then
+                SetRoutingBucketPopulationEnabled(bucket_id, bucket_config.population_enabled)
+            end
+
+            local init_season = bucket_config.season
+            local init_weather = bucket_config.dynamic_weather and cfg_weather.seasons[init_season][math.random(1, #cfg_weather.seasons[init_season])] or bucket_config.weather
+            local weather_type = cfg_weather.types[init_weather]
+            local effects = weather_type and weather_type.effects
+
+            local function resolve_effect(val)
+                if type(val) == "table" then return math.random(val.min or val[1], val.max or val[2]) / 100 end
+                return val or 0.0
+            end
+
+            core.bucket_environments[bucket_id] = {
+                season = init_season,
+                weather = init_weather,
+                hour = bucket_config.dynamic_time and math.random(0, 23) or bucket_config.hour,
+                minute = bucket_config.dynamic_time and math.random(0, 59) or bucket_config.minute,
+                day = bucket_config.dynamic_time and math.random(1, 30) or bucket_config.day,
+                month = bucket_config.month,
+                year = bucket_config.year,
+                rain_level = effects and resolve_effect(effects.rain) or 0.0,
+                snow_level = effects and resolve_effect(effects.snow) or 0.0,
+                wind_speed = effects and resolve_effect(effects.wind) or 0.5,
+                wind_direction = math.random(0, 360),
+                dynamic_weather = bucket_config.dynamic_weather,
+                dynamic_time = bucket_config.dynamic_time,
+                freeze_weather = bucket_config.freeze_weather
+            }
+
+            core.update_weather_effects(core.bucket_environments[bucket_id], init_weather)
+            core.load_bucket_weather(bucket_id, bucket_config)
+        end
+    end)
+
+    --- @section Inventory
+
+    local Containers = require("src.server.registry.containers")
+    local Drops = require("src.server.registry.drops")
+
+    core.containers = Containers.new()
+    core.drops = Drops.new()
+
+    local inventory_data_modules = {
+        items = "configs.items",
+        inventories = "configs.inventories",
+        metadata = "configs.metadata",
+    }
+
+    function core.sanitize_table(tbl)
+        if type(tbl) ~= "table" then return tbl end
+        local copy = {}
+        for k, v in pairs(tbl) do
+            if k ~= "can_access" and type(v) ~= "function" then
+                copy[k] = type(v) == "table" and core.sanitize_table(v) or v
+            end
+        end
+        return copy
+    end
+
+    local function get_sanitized_inventory_data()
+        local out = {}
+        for key, module_path in pairs(inventory_data_modules) do
+            local ok, raw = pcall(require, module_path)
+            if ok and type(raw) == "table" then
+                out[key] = core.sanitize_table(raw)
+            else
+                log("error", locale("init.data_load", module_path))
+            end
+        end
+        return out
+    end
+
+    function core.sync_static_data_to_client(source)
+        TriggerClientEvent("rig:cl:sync_static_data", source, get_sanitized_inventory_data())
+    end
+
+    --- @section Database
+
+    CreateThread(function()
+        Wait(500)
+        local table_name = core.convars.inventory_table
+        MySQL.Async.execute(([[
+            CREATE TABLE IF NOT EXISTS `%s` (
+                `id` BIGINT NOT NULL AUTO_INCREMENT,
+                `identifier` VARCHAR(255) NOT NULL,
+                `owner` VARCHAR(255) NOT NULL,
+                `type` ENUM('player', 'vehicle', 'container', 'drop') NOT NULL DEFAULT 'player',
+                `subtype` VARCHAR(50) DEFAULT NULL,
+                `items` JSON NOT NULL DEFAULT (JSON_OBJECT()),
+                `metadata` JSON DEFAULT (JSON_OBJECT()),
+                `last_update` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `identifier_unique` (`identifier`),
+                KEY `owner_idx` (`owner`),
+                KEY `type_subtype_idx` (`type`, `subtype`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        ]]):format(table_name), {}, function(result)
+            if result then
+                log("success", locale("init.db_table_ready", table_name))
+            else
+                log("error", locale("init.db_table_failed", table_name))
+            end
+        end)
+    end)
+
+    --- @section Item Registration
+
+    local usable_items = {}
+
+    --- Registers all usable items from static item definitions
+    --- @return number: Total number of items successfully registered
+    local function register_usable_items()
+        local item_defs = require("configs.items")
+        local count = 0
+        
+        for id, def in pairs(item_defs) do
+            if def.actions and def.actions.use then
+                usable_items[id] = def.actions.use
+                log("success", locale("registry.item_registered", id))
+                count = count + 1
+            end
+        end
+        
+        log("success", locale("registry.usable_registered", count))
+        return count
+    end
+
+    SetTimeout(500, function()
+        register_usable_items()
+    end)
+
+    --- Registers an item as usable
+    --- @param id string: The unique identifier for the item
+    --- @param use_data function|table: Function or action table executed when item is used
+    --- @return boolean: Whether the item was registered successfully
+    function core.register_usable_item(id, use_data)
+        if not id or type(id) ~= "string" then
+            log("error", locale("registry.bad_item_id", tostring(id)))
+            return false
+        end
+        
+        if type(use_data) ~= "function" and type(use_data) ~= "table" then
+            log("error", locale("registry.bad_item_use", id))
+            return false
+        end
+        
+        if usable_items[id] then
+            log("warn", locale("registry.item_exists", id))
+            return false
+        end
+        
+        usable_items[id] = use_data
+        log("success", locale("registry.item_registered", id))
+        return true
+    end
+
+    --- Gets a usable item handler
+    --- @param item_id string: Item identifier
+    --- @return function|table|nil: Item use handler or nil if not registered
+    function core.get_usable_item(item_id)
+        return usable_items[item_id]
+    end
+
+    --- Checks whether an item is usable
+    --- @param item_id string: Item identifier
+    --- @return boolean: True if the item is registered as usable
+    function core.is_usable(item_id)
+        return usable_items[item_id] ~= nil
+    end
+
+end
+
+--- @section Client
+
+if not core.is_server then
+
+    --- Stores sanitized static data sent from server on player load
+    --- Never require configs directly on client - data comes through this only
+    core.static_data = {}
+
+    --- Receives and stores sanitized static data from server
+    RegisterNetEvent("rig:cl:sync_static_data", function(data)
+        if type(data) ~= "table" then
+            log("error", locale("init.data_sync_fail"))
+            return
+        end
+        core.static_data = data
+        log("success", locale("init.data_sync_ok"))
+    end)
+
+    --- Gets a specific static data set by key
+    --- @param key string: Data key e.g. "items", "inventories", "metadata"
+    --- @return table|nil
+    function core.get_static_data(key)
+        return core.static_data[key]
+    end
+
+    --- Register pluck grid slot move handler
+    SetTimeout(150, function()
+        pluck.set_grid_move_handler(function(data)
+            TriggerServerEvent("rig:sv:move_item", data)
+        end)
+    end)
+
+end
+
 --- @section Startup Message
 
 if core.is_server and core.convars.console_splash then
@@ -148,26 +419,19 @@ if core.is_server and core.convars.console_splash then
 
     local function log_setting(key, value)
         local function format_value(v)
-            if type(v) == "boolean" then
-                return v and "^2true" or "^1false"
-            end
+            if type(v) == "boolean" then return v and "^2true" or "^1false" end
             return "^2" .. tostring(v)
         end
-
         if type(value) == "table" then
             print("^7    " .. key .. ":")
-            for k, v in pairs(value) do
-                print("^7      " .. k .. ": " .. format_value(v))
-            end
+            for k, v in pairs(value) do print("^7      " .. k .. ": " .. format_value(v)) end
         else
             print("^7    " .. key .. ": " .. format_value(value))
         end
     end
 
     for key, value in pairs(core.convars) do
-        if key ~= "console_splash" then
-            log_setting(key, value)
-        end
+        if key ~= "console_splash" then log_setting(key, value) end
     end
 
     print("^2 ------------------------------------------------------------")
@@ -182,6 +446,5 @@ SetTimeout(250, function()
             error(locale("init.ns_blocked", key), 2)
         end
     })
-    
     log("success", locale("init.ns_ready", core.metadata.name))
 end)

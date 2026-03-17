@@ -35,5 +35,5 @@ return {
         poison = 0.0
     },
 
-    tick_rate = 5000 -- Status update tick (5seconds)
+    tick_rate = 10000 -- Status update tick (5seconds)
 }

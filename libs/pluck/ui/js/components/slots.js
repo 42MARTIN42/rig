@@ -196,7 +196,7 @@ export class Slots {
             if (position.transform) pos_style += ` transform: ${position.transform};`;
 
             const slot_num = String(index + 1);
-            const item_data = group_items[slot_num];
+            const item_data = group_items[slot_num] || group_items[slot_def.id];
             const item = item_data ? { ...item_data, slot_num, group_id } : null;
 
             const slot_html = this.create_slot(item, index, group_id, null, slot_id, size);

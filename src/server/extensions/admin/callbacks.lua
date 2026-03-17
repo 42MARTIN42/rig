@@ -19,23 +19,6 @@ local callbacks = require("libs.graft.fivem.callbacks")
 local utils = require("src.server.modules.utils")
 local cfg_admin = require("configs.admin")
 
---- @section Statuses
-
-callbacks.register("rig:sv:validate_revive", function(source, data, cb)
-    local player = core.players:get(source)
-    if not player then cb({ valid = false }) return end
-    local valid = player:run_method("get_status", "pending_revive") == true
-    player:run_method("set_status", "pending_revive", false)
-    cb({ valid = valid })
-end)
-
-callbacks.register("rig:sv:validate_respawn", function(source, data, cb)
-    local player = core.players:get(source)
-    if not player then cb({ valid = false }) return end
-    local valid = player:run_method("get_status", "is_dead") == true
-    cb({ valid = valid })
-end)
-
 --- @section Admin
 
 callbacks.register("rig:sv:admin_can_open_menu", function(source, data, cb)
@@ -45,8 +28,6 @@ callbacks.register("rig:sv:admin_can_open_menu", function(source, data, cb)
     end
     cb({ allowed = utils.has_permission(source, cfg_admin.permissions.open_menu) })
 end)
-
---- @section Callbacks
 
 callbacks.register("rig:sv:admin_toggle_noclip", function(source, data, cb)
     cb({ allowed = utils.has_permission(source, cfg_admin.permissions.user.noclip) })

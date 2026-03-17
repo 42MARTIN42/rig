@@ -49,6 +49,5 @@ CreateThread(function()
         Wait(250) 
     end
     Wait(1000)
-    print("connecting sending loadscreen message")
     SendLoadingScreenMessage(json.encode({ action = "load_complete" }))
 end)

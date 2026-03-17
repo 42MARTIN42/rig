@@ -40,8 +40,7 @@ export class Grid {
         this.items = items;
         this.draggable = draggable;
         this.container_selector = null;
-        this._drag = null;
-        this._ghost = null;
+        this._$container = null;
     }
 
     _grid_style() {
@@ -122,32 +121,33 @@ export class Grid {
 
         const $container = this._$container;
         const ns = `griddrag_${this.section_key}`;
-        $container.off(`pointerdown.${ns}`);
-        $(document).off(`pointermove.${ns} pointerup.${ns} pointercancel.${ns}`);
+        Grid._drag ??= null;
+        Grid._ghost ??= null;
+        Grid._global_bound ??= false;
 
         const cleanup = () => {
-            this._drag = null;
-            if (this._ghost) {
-                this._ghost.remove();
-                this._ghost = null;
+            Grid._drag = null;
+            if (Grid._ghost) {
+                Grid._ghost.remove();
+                Grid._ghost = null;
             }
-            $container.find(".grid_item_dragging").removeClass("grid_item_dragging");
-            $container.find(".grid_cell_drop_target").removeClass("grid_cell_drop_target");
+            $(".grid_item_dragging").removeClass("grid_item_dragging");
+            $(".grid_cell_drop_target").removeClass("grid_cell_drop_target");
             window.ui_instance?.tooltip?.hide?.();
         };
 
         const get_cell_at = (x, y) => {
-            const items_layer = $container.find(".grid_items")[0];
-            const prev = items_layer ? items_layer.style.pointerEvents : "";
-            if (items_layer) items_layer.style.pointerEvents = "none";
+
+            const layers = document.querySelectorAll(".grid_items");
+            layers.forEach(l => (l.style.pointerEvents = "none"));
+
             const under = document.elementFromPoint(x, y);
 
-            if (items_layer) items_layer.style.pointerEvents = prev;
-            if (!under) return null;
+            layers.forEach(l => (l.style.pointerEvents = ""));
 
+            if (!under) return null;
             const cell = under.closest(".grid_cell");
             if (!cell) return null;
-            if (!$container[0].contains(cell)) return null;
 
             return {
                 col: parseInt(cell.dataset.col),
@@ -156,47 +156,64 @@ export class Grid {
             };
         };
 
-        const highlight_cells = (col, row, w, h) => {
-            $container.find(".grid_cell_drop_target").removeClass("grid_cell_drop_target");
+        const highlight_cells = (col, row, w, h, section_key) => {
+            $(".grid_cell_drop_target").removeClass("grid_cell_drop_target");
+
+            const $target_container = $(`[data-section-key="${section_key}"]`).filter(function () {
+                return $(this).find(".grid_cells").length > 0 || $(this).hasClass("grid_cells");
+            });
+
+            const $cells_layer = $(`[data-section-key="${section_key}"] .grid_cells`);
             for (let c = col; c < col + w; c++) {
                 for (let r = row; r < row + h; r++) {
-                    $container.find(`.grid_cells .grid_cell[data-col="${c}"][data-row="${r}"]`).addClass("grid_cell_drop_target");
+                    $cells_layer.find(`.grid_cell[data-col="${c}"][data-row="${r}"]`).addClass("grid_cell_drop_target");
                 }
             }
         };
 
-        $(document).on(`pointermove.${ns}`, (e) => {
-            if (!this._drag || !this._ghost) return;
-            this._ghost.css({ left: e.clientX + 8, top: e.clientY + 8 });
-            const cell = get_cell_at(e.clientX, e.clientY);
-            if (cell) highlight_cells(cell.col, cell.row, this._drag.w, this._drag.h);
-        });
+        if (!Grid._global_bound) {
+            Grid._global_bound = true;
 
-        $(document).on(`pointerup.${ns} pointercancel.${ns}`, async (e) => {
-            if (!this._drag) return;
-            const d = this._drag;
-            const cell = get_cell_at(e.clientX, e.clientY);
+            $(document).on("pointermove.griddrag_global", (e) => {
+                if (!Grid._drag || !Grid._ghost) return;
+                Grid._ghost.css({ left: e.clientX + 8, top: e.clientY + 8 });
+                const cell = get_cell_at(e.clientX, e.clientY);
+                if (cell) highlight_cells(cell.col, cell.row, Grid._drag.w, Grid._drag.h, cell.section);
+            });
 
-            if (!cell || (d.from_col === cell.col && d.from_row === cell.row)) {
+            $(document).on("pointerup.griddrag_global pointercancel.griddrag_global", async (e) => {
+                if (!Grid._drag) return;
+                const d = Grid._drag;
+                const cell = get_cell_at(e.clientX, e.clientY);
+
+                if (!cell) {
+                    cleanup();
+                    return;
+                }
+
+                if (d.from_section === cell.section && d.from_col === cell.col && d.from_row === cell.row) {
+                    cleanup();
+                    return;
+                }
+
+                if (typeof d.on_move === "function") {
+                    await d.on_move(
+                        String(d.item_id),
+                        String(d.from_col),
+                        String(d.from_row),
+                        String(cell.col),
+                        String(cell.row),
+                        String(d.from_section),
+                        String(cell.section),
+                        d.dataset
+                    );
+                }
+
                 cleanup();
-                return;
-            }
+            });
+        }
 
-            if (typeof d.on_move === "function") {
-                await d.on_move(
-                    String(d.item_id),
-                    String(d.from_col),
-                    String(d.from_row),
-                    String(cell.col),
-                    String(cell.row),
-                    String(d.from_section),
-                    String(cell.section)
-                );
-            }
-
-            cleanup();
-        });
-
+        $container.off(`pointerdown.${ns}`);
         $container.on(`pointerdown.${ns}`, ".grid_item", (e) => {
             const $item = $(e.currentTarget);
 
@@ -209,13 +226,16 @@ export class Grid {
 
             if (!item_id || !from_section) return;
 
-            this._drag = { item_id, from_col, from_row, w, h, from_section, on_move: this.on_move };
+            const dataset = {};
+            Object.entries(e.currentTarget.dataset).forEach(([k, v]) => { dataset[k] = v; });
+
+            Grid._drag = { item_id, from_col, from_row, w, h, from_section, on_move: this.on_move, dataset };
 
             e.currentTarget.classList.add("grid_item_dragging");
 
-            this._ghost?.remove();
-            this._ghost = $item.clone();
-            this._ghost.css({
+            Grid._ghost?.remove();
+            Grid._ghost = $item.clone();
+            Grid._ghost.css({
                 position: "fixed",
                 left: e.clientX + 8,
                 top: e.clientY + 8,
@@ -225,7 +245,7 @@ export class Grid {
                 height: $item.outerHeight(),
                 opacity: 0.85
             });
-            $("body").append(this._ghost);
+            $("body").append(Grid._ghost);
 
             e.preventDefault();
         });

@@ -85,3 +85,12 @@ CreateThread(function()
         Wait(1000) 
     end
 end)
+
+--- @section Inventory
+
+CreateThread(function()
+    while true do
+        Wait(300000)
+        core.containers:cleanup_stale_vehicles(300000)
+    end
+end)
